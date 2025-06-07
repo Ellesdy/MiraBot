@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Servers - MIRA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .servers-container {
+            margin-top: 2rem;
+        }
+        .server-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            transition: transform 0.3s;
+        }
+        .server-card:hover {
+            transform: translateY(-5px);
+        }
+        .server-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .btn-manage {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            border-radius: 25px;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .btn-manage:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-robot"></i> MIRA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard/servers">Manage Servers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purchase">Purchase Tokens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-person-circle"></i> <%= user.username %>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container servers-container">
+        <h1 class="text-white mb-4">
+            <i class="bi bi-hdd-stack"></i> Manage Your Servers
+        </h1>
+        <p class="text-white mb-4">Configure MIRA settings for servers where you have admin permissions.</p>
+        
+        <% if (!guilds || guilds.length === 0) { %>
+            <div class="server-card text-center">
+                <h4>No Servers Found</h4>
+                <p>You don't have admin permissions in any servers with MIRA.</p>
+                <p>Invite MIRA to your server and make sure you have administrator permissions.</p>
+            </div>
+        <% } else { %>
+            <div class="row">
+                <% guilds.forEach(function(guild) { %>
+                    <div class="col-md-6">
+                        <div class="server-card">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <% if (guild.icon) { %>
+                                        <img src="https://cdn.discordapp.com/icons/<%= guild.id %>/<%= guild.icon %>.png" 
+                                             alt="<%= guild.name %>" 
+                                             class="server-icon me-3">
+                                    <% } else { %>
+                                        <div class="server-icon me-3 d-flex align-items-center justify-content-center" 
+                                             style="background: #6c757d;">
+                                            <i class="bi bi-hash" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                    <% } %>
+                                    <div>
+                                        <h5 class="mb-0"><%= guild.name %></h5>
+                                        <small class="text-muted">
+                                            <% if (guild.owner) { %>
+                                                <span class="badge bg-warning">Owner</span>
+                                            <% } else { %>
+                                                <span class="badge bg-info">Admin</span>
+                                            <% } %>
+                                        </small>
+                                    </div>
+                                </div>
+                                <a href="/dashboard/server/<%= guild.id %>" class="btn btn-manage">
+                                    <i class="bi bi-gear-fill"></i> Manage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+
+    <footer class="text-center text-white py-4 mt-5">
+        <p>&copy; 2024 MIRA Discord Bot. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

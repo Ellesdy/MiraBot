@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Shares - MIRA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .shares-container {
+            margin-top: 2rem;
+        }
+        .portfolio-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            color: white;
+        }
+        .server-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            color: white;
+            transition: transform 0.3s;
+        }
+        .server-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+        .btn-invest {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: transform 0.2s;
+        }
+        .btn-invest:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(45deg, #00cc66, #00aa55);
+        }
+        .profit {
+            color: #00ff88;
+        }
+        .loss {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-robot"></i> MIRA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/shares">My Shares</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purchase">Purchase Tokens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-person-circle"></i> <%= user.username %>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container shares-container">
+        <h1 class="text-center text-white mb-5">
+            <i class="bi bi-graph-up"></i> Server Share Portfolio
+        </h1>
+        
+        <!-- Portfolio Overview -->
+        <div class="portfolio-card">
+            <h3><i class="bi bi-briefcase-fill"></i> Portfolio Overview</h3>
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <h5>Total Investment</h5>
+                    <div class="stat-value"><%= totalInvestment.toLocaleString() %></div>
+                    <small>tokens invested</small>
+                </div>
+                <div class="col-md-3">
+                    <h5>Current Value</h5>
+                    <div class="stat-value"><%= currentValue.toLocaleString() %></div>
+                    <small>tokens value</small>
+                </div>
+                <div class="col-md-3">
+                    <h5>Total Dividends</h5>
+                    <div class="stat-value"><%= totalDividends.toLocaleString() %></div>
+                    <small>tokens earned</small>
+                </div>
+                <div class="col-md-3">
+                    <h5>Total Return</h5>
+                    <div class="stat-value <%= totalReturn >= 0 ? 'profit' : 'loss' %>">
+                        <%= totalReturn >= 0 ? '+' : '' %><%= totalReturn.toLocaleString() %>
+                    </div>
+                    <small><%= ((totalReturn / totalInvestment) * 100).toFixed(1) %>% ROI</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Server Investments -->
+        <h2 class="text-white mt-5 mb-3">Your Investments</h2>
+        <% if (investments.length === 0) { %>
+            <div class="portfolio-card text-center">
+                <h4>No Investments Yet</h4>
+                <p>You haven't purchased shares in any servers yet.</p>
+                <p>Join Discord servers with share systems enabled to start investing!</p>
+            </div>
+        <% } else { %>
+            <% investments.forEach(function(investment) { %>
+                <div class="server-card">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4>
+                                <% if (investment.serverIcon) { %>
+                                    <img src="<%= investment.serverIcon %>" alt="" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+                                <% } %>
+                                <%= investment.serverName %>
+                            </h4>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <strong>Shares Owned:</strong> <%= investment.shares %> (<%= investment.percentage.toFixed(1) %>%)
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Investment:</strong> <%= investment.purchaseValue.toLocaleString() %> tokens
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Current Value:</strong> <%= investment.currentValue.toLocaleString() %> tokens
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4">
+                                    <strong>Dividends Earned:</strong> <%= investment.dividendsEarned.toLocaleString() %> tokens
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Est. Daily:</strong> ~<%= investment.estimatedDaily %> tokens/day
+                                </div>
+                                <div class="col-md-4">
+                                    <strong>Total Return:</strong> 
+                                    <span class="<%= investment.totalReturn >= 0 ? 'profit' : 'loss' %>">
+                                        <%= investment.totalReturn >= 0 ? '+' : '' %><%= investment.totalReturn.toLocaleString() %> tokens
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <% if (investment.canManage) { %>
+                                <button class="btn btn-invest" onclick="manageInvestment('<%= investment.serverId %>')">
+                                    <i class="bi bi-gear-fill"></i> Manage
+                                </button>
+                            <% } else { %>
+                                <small class="text-muted">Join server to manage</small>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+
+        <!-- Available Investments -->
+        <h2 class="text-white mt-5 mb-3">Available Investments</h2>
+        <% if (availableServers.length === 0) { %>
+            <div class="portfolio-card text-center">
+                <p>No servers with share systems available in your current servers.</p>
+            </div>
+        <% } else { %>
+            <% availableServers.forEach(function(server) { %>
+                <div class="server-card">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4>
+                                <% if (server.icon) { %>
+                                    <img src="<%= server.icon %>" alt="" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+                                <% } %>
+                                <%= server.name %>
+                            </h4>
+                            <p class="mb-2"><%= server.memberCount %> members • <%= server.activity %> activity level</p>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong>Share Price:</strong> <%= server.sharePrice.toLocaleString() %> tokens
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>Available:</strong> <%= server.availableShares %>/<%= server.totalShares %>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>Dividend:</strong> <%= server.dividendRate %>%
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>Market Cap:</strong> <%= server.marketCap.toLocaleString() %> tokens
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-invest" onclick="investInServer('<%= server.id %>')">
+                                <i class="bi bi-cash-stack"></i> Invest Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
+
+    <footer class="text-center text-white py-4 mt-5">
+        <p>&copy; 2024 MIRA Discord Bot. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function manageInvestment(serverId) {
+            // In a real implementation, this would open a modal or redirect to management page
+            window.location.href = `/shares/manage/${serverId}`;
+        }
+        
+        function investInServer(serverId) {
+            // In a real implementation, this would open an investment modal
+            window.location.href = `/shares/invest/${serverId}`;
+        }
+    </script>
+</body>
+</html> 

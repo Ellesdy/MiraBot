@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - MIRA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .transactions-container {
+            margin-top: 2rem;
+        }
+        .transactions-table {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            color: white;
+        }
+        .table {
+            color: white;
+        }
+        .table tbody tr {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .earn {
+            color: #00ff88;
+            font-weight: 600;
+        }
+        .spend {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        .admin_add {
+            color: #00ccff;
+            font-weight: 600;
+        }
+        .admin_remove {
+            color: #ff9f40;
+            font-weight: 600;
+        }
+        .badge-type {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-robot"></i> MIRA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/dashboard/transactions">Transactions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purchase">Purchase Tokens</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-person-circle"></i> <%= user.username %>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container transactions-container">
+        <h1 class="text-white mb-4">
+            <i class="bi bi-clock-history"></i> Transaction History
+        </h1>
+
+        <div class="transactions-table">
+            <% if (transactions.length === 0) { %>
+                <p class="text-center">No transactions found.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Server</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% transactions.forEach(function(transaction) { %>
+                                <tr>
+                                    <td>
+                                        <%= new Date(transaction.timestamp * 1000).toLocaleString() %>
+                                    </td>
+                                    <td>
+                                        <% if (transaction.type === 'earn') { %>
+                                            <span class="badge bg-success badge-type">EARN</span>
+                                        <% } else if (transaction.type === 'spend') { %>
+                                            <span class="badge bg-danger badge-type">SPEND</span>
+                                        <% } else if (transaction.type === 'admin_add') { %>
+                                            <span class="badge bg-info badge-type">ADMIN+</span>
+                                        <% } else if (transaction.type === 'admin_remove') { %>
+                                            <span class="badge bg-warning badge-type">ADMIN-</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="<%= transaction.type %>">
+                                        <%= transaction.type === 'earn' || transaction.type === 'admin_add' ? '+' : '-' %><%= Math.abs(transaction.amount) %>
+                                    </td>
+                                    <td>
+                                        <%= transaction.description %>
+                                        <% if (transaction.action) { %>
+                                            <small class="text-muted">(Action: <%= transaction.action %>)</small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (transaction.serverId === 'payment') { %>
+                                            <span class="badge bg-primary">Payment</span>
+                                        <% } else { %>
+                                            <small class="text-muted"><%= transaction.serverId %></small>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3 text-muted">
+                    <small>Showing last <%= transactions.length %> transactions</small>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <footer class="text-center text-white py-4 mt-5">
+        <p>&copy; 2024 MIRA Discord Bot. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

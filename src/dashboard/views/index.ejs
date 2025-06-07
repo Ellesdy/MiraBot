@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRA - Discord Bot Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .main-container {
+            margin-top: 2rem;
+        }
+        .hero-section {
+            text-align: center;
+            color: white;
+            padding: 4rem 0;
+        }
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            color: white;
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(45deg, #ff5252, #ff1744);
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            color: white;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-robot"></i> MIRA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purchase">Purchase Tokens</a>
+                    </li>
+                    <% if (user) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">
+                                <i class="bi bi-person-circle"></i> <%= user.username %>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/logout">Logout</a>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/login">
+                                <i class="bi bi-discord"></i> Login with Discord
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <div class="hero-section">
+            <h1 class="hero-title">Welcome to MIRA</h1>
+            <p class="lead mb-4">The advanced Discord bot with voice-based token rewards</p>
+            
+            <div class="row justify-content-center mb-5">
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">🎤</div>
+                        <div>Voice Rewards</div>
+                        <small>Earn 1 token/minute</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">💰</div>
+                        <div>Token System</div>
+                        <small>Use tokens for actions</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">🛒</div>
+                        <div>Purchase Options</div>
+                        <small>Buy tokens instantly</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-number">⚡</div>
+                        <div>Instant Actions</div>
+                        <small>Perform fun commands</small>
+                    </div>
+                </div>
+            </div>
+
+            <% if (!user) { %>
+                <a href="/auth/login" class="btn btn-primary btn-lg">
+                    <i class="bi bi-discord"></i> Login to Get Started
+                </a>
+            <% } else { %>
+                <a href="/dashboard" class="btn btn-primary btn-lg me-3">
+                    <i class="bi bi-speedometer2"></i> Go to Dashboard
+                </a>
+                <a href="/purchase" class="btn btn-primary btn-lg">
+                    <i class="bi bi-cart"></i> Purchase Tokens
+                </a>
+            <% } %>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3><i class="bi bi-mic-fill"></i> Voice Activity Rewards</h3>
+                    <p>Join any voice channel and start earning tokens automatically. Earn 1 token per minute while active in voice channels!</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3><i class="bi bi-lightning-fill"></i> Instant Token Actions</h3>
+                    <p>Use your tokens to perform fun actions like changing nicknames, timeouts, voice disconnects, and more!</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3><i class="bi bi-credit-card-fill"></i> Multiple Payment Options</h3>
+                    <p>Purchase tokens instantly with credit card via Stripe or cryptocurrency via Coinbase Commerce.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3><i class="bi bi-shield-check"></i> Secure & Reliable</h3>
+                    <p>Advanced security features, rate limiting, and permission checks ensure a safe experience for all users.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3><i class="bi bi-gear-fill"></i> Fully Customizable</h3>
+                    <p>Server admins can configure token rewards, action prices, cooldowns, and more through the dashboard.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3><i class="bi bi-graph-up"></i> Detailed Analytics</h3>
+                    <p>Track your token earnings, spending, and transaction history with comprehensive analytics.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-white py-4 mt-5">
+        <p>&copy; 2024 MIRA Discord Bot. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

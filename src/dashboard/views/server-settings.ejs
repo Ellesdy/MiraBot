@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Settings - MIRA Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .settings-container {
+            margin-top: 2rem;
+        }
+        .settings-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        .form-label {
+            color: white;
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+        }
+        .btn-save {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            border: none;
+            padding: 0.5rem 2rem;
+            font-weight: 600;
+            border-radius: 25px;
+            color: white;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-robot"></i> MIRA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard/servers">Manage Servers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-person-circle"></i> <%= user.username %>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container settings-container">
+        <div class="d-flex align-items-center mb-4 text-white">
+            <a href="/dashboard/servers" class="text-white me-3">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <h1 class="mb-0">
+                <% if (guild.icon) { %>
+                    <img src="https://cdn.discordapp.com/icons/<%= guild.id %>/<%= guild.icon %>.png" 
+                         alt="<%= guild.name %>" 
+                         style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+                <% } %>
+                <%= guild.name %> Settings
+            </h1>
+        </div>
+
+        <% if (!server) { %>
+            <div class="settings-card">
+                <h4>MIRA Not Set Up</h4>
+                <p>MIRA hasn't been configured for this server yet. The bot will use default settings until you save custom configuration.</p>
+            </div>
+        <% } %>
+
+        <form id="settingsForm">
+            <!-- Voice Activity Settings -->
+            <div class="settings-card">
+                <h4><i class="bi bi-mic-fill"></i> Voice Activity Settings</h4>
+                <hr class="border-white opacity-25">
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="voiceActivityRewards" 
+                           <%= server && server.settings.voiceActivityRewards ? 'checked' : '' %>>
+                    <label class="form-check-label" for="voiceActivityRewards">
+                        Enable Voice Activity Rewards
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <label for="voiceTokensPerMinute" class="form-label">Tokens per Minute</label>
+                    <input type="number" class="form-control" id="voiceTokensPerMinute" 
+                           value="<%= server ? server.settings.voiceTokensPerMinute : 1 %>" min="0" max="100">
+                    <small class="text-muted">How many tokens users earn per minute in voice channels</small>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="requireOthersInVoice" 
+                           <%= server && server.settings.requireOthersInVoice ? 'checked' : '' %>>
+                    <label class="form-check-label" for="requireOthersInVoice">
+                        Require Others in Voice Channel
+                    </label>
+                    <small class="d-block text-muted">Only award tokens when multiple users are in the same voice channel</small>
+                </div>
+            </div>
+
+            <!-- Share System Settings -->
+            <div class="settings-card">
+                <h4><i class="bi bi-graph-up"></i> Share System Settings</h4>
+                <hr class="border-white opacity-25">
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="sharesEnabled" 
+                           <%= server && server.settings.sharesEnabled ? 'checked' : '' %>>
+                    <label class="form-check-label" for="sharesEnabled">
+                        Enable Share System
+                    </label>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="sharePrice" class="form-label">Share Price (tokens)</label>
+                        <input type="number" class="form-control" id="sharePrice" 
+                               value="<%= server ? server.settings.sharePrice : 10000 %>" min="1">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="totalShares" class="form-label">Total Shares Available</label>
+                        <input type="number" class="form-control" id="totalShares" 
+                               value="<%= server ? server.settings.totalShares : 100 %>" min="1" max="1000">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="dividendPercentage" class="form-label">Dividend Percentage</label>
+                        <input type="number" class="form-control" id="dividendPercentage" 
+                               value="<%= server ? server.settings.dividendPercentage : 0.5 %>" 
+                               min="0" max="10" step="0.1">
+                        <small class="text-muted">Percentage of spent tokens distributed to shareholders</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="maxSharesPerUser" class="form-label">Max Shares per User</label>
+                        <input type="number" class="form-control" id="maxSharesPerUser" 
+                               value="<%= server ? server.settings.maxSharesPerUser : 10 %>" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Settings -->
+            <div class="settings-card">
+                <h4><i class="bi bi-chat-dots-fill"></i> Channel Settings</h4>
+                <hr class="border-white opacity-25">
+                
+                <div class="mb-3">
+                    <label for="moderationLogChannel" class="form-label">Action Log Channel ID</label>
+                    <input type="text" class="form-control" id="moderationLogChannel" 
+                           value="<%= server && server.settings.moderationLogChannel ? server.settings.moderationLogChannel : '' %>"
+                           placeholder="Leave empty to disable logging">
+                    <small class="text-muted">
+                        Channel ID where all token actions will be logged. 
+                        To get a channel ID: Right-click a channel → Copy Channel ID (Developer Mode must be enabled)
+                    </small>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-save">
+                    <i class="bi bi-check-lg"></i> Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="text-center text-white py-4 mt-5">
+        <p>&copy; 2024 MIRA Discord Bot. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const settings = {
+                voiceActivityRewards: document.getElementById('voiceActivityRewards').checked,
+                voiceTokensPerMinute: parseInt(document.getElementById('voiceTokensPerMinute').value),
+                requireOthersInVoice: document.getElementById('requireOthersInVoice').checked,
+                sharesEnabled: document.getElementById('sharesEnabled').checked,
+                sharePrice: parseInt(document.getElementById('sharePrice').value),
+                totalShares: parseInt(document.getElementById('totalShares').value),
+                dividendPercentage: parseFloat(document.getElementById('dividendPercentage').value),
+                maxSharesPerUser: parseInt(document.getElementById('maxSharesPerUser').value),
+                moderationLogChannel: document.getElementById('moderationLogChannel').value || undefined
+            };
+
+            try {
+                const response = await fetch(`/api/server/<%= guild.id %>/settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    alert('Settings saved successfully!');
+                } else {
+                    alert('Failed to save settings. Please try again.');
+                }
+            } catch (error) {
+                alert('Error saving settings. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html> 
